@@ -19,15 +19,20 @@ passport.deserializeUser(async (email, done) => {
 });
 
 passport.use(new LocalStrategy({usernameField: 'email'}, async (email, password, done) => {
-    await UserModule.findByEmail(email)
+    try {
+        await UserModule.findByEmail(email)
         .then((targetUser) => {
-            console.log(targetUser)
-            bcrypt.compare(password, targetUser[0].passwordHash, (err, checkResult) => {
-                if (checkResult) return done(null, targetUser[0]);
-                else return done(null, false);
+            bcrypt.compare(password, targetUser.passwordHash, (err, checkResult) => {
+                if (checkResult) return done(null, {data: targetUser, status: 'ok'});
+                return done(null, {error: 'Неверный логин или пароль' , status: 'error'});
             });
         })
         .catch(() => {
-            return done(null, false);
-    });
+            return done(null, {error: 'Неверный логин или пароль' , status: 'error'});
+        });
+    }
+    catch(err) {
+        console.log(err)
+        return done(null, err);
+    }
 }));

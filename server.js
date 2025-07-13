@@ -7,12 +7,11 @@ const app = express();
 const server = require('http').createServer(app);
 const io = require("socket.io")(server);
 const session = require('express-session');
-const bodyParser = require('body-parser');
 const passport = require('passport');
 const passportConfig = require('./passport/passport');
 const database = require('./database/database');
 const apiRouter = require('./routes/apiRouter');
-// const initSocket = require('./ws/socketHandler');
+const initSocket = require('./ws/socketHandler');
 
 
 const sessionMiddleware = session({
@@ -43,5 +42,5 @@ server.listen(PORT, () => {
 });
 database();
 
-// io.engine.use(sessionMiddleware);
-// initSocket(io);
+io.engine.use(sessionMiddleware);
+initSocket(io);

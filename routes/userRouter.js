@@ -2,11 +2,20 @@ const router = require('express').Router();
 const passport = require('passport');
 const UserModule = require('../modules/UserModule');
 const hashPassword = require('../utils/hashPassword');
-const isAuthenticated = require('../utils/isAuthenticated');
+
+
+router.get('/all-users', async (req, res) => {
+    await UserModule.getAllUsers()
+    .then((allUsers) => {
+        res.status(200).json({data: allUsers});
+    })
+    
+});
 
 router.post('/signup', async (req, res) => {
      try {
         const data = req.body;
+        console.log(req.body)
         await hashPassword(data.password)
         .then((hashPassword) => {
             const userData = {
@@ -29,17 +38,13 @@ router.post('/signup', async (req, res) => {
     }
 });
 
-router.post('/signin', passport.authenticate('local'), (req, res) => {
-    console.log(req.user)
-    if (!user) { return res.redirect('/login'); }
-    req.logIn(user, function(err) {
-      if (err) { return next(err); }
-      return res.redirect('/users/' + user.username);
-    });
+router.post('/signin', passport.authenticate('local'), async (req, res, next) => {
+    return res.status(200).json(req.user);
 });
 
 router.post('/logout', async (req, res) => {
     if (req.isAuthenticated()) {
+        req.logOut();
     }
 });
 

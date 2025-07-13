@@ -6,31 +6,54 @@ class UserModule {
         this.userCollection = userCollection;
     }
 
+    async getAllUsers() {
+        try {
+            return await userCollection.find({}, {'_id': 1, 'email': 1})
+            .then((users) => {
+                return users;
+            })
+        }
+        catch(err) {
+
+        }
+    }
+
     async create(data) {
-        return new Promise((resolve, reject) => {
+        try {
             const user = {
                 email: data.email,
                 passwordHash: data.passwordHash,
                 name: data.name,
                 contactPhone: data.contactPhone ? data.contactPhone : '',
             };
-            this.findByEmail(user.email)
+            return await this.findByEmail(user.email)
             .then((userData) => {
-                if (userData.length === 0) {
+                if (!userData) {
                     const userObj = userCollection.create(user);
-                    return resolve(userObj);
+                    return userObj;
                 }
-                return reject({'message': 'email exists'});
+                return {'message': 'email exists'}
             })
-        });
+        }
+        catch(err) {
+
+        }
     };
 
     async findByEmail(userEmail) {
        try {
             return new Promise((resolve, reject) => {
-                const targetUser = this.userCollection.findOne({email: userEmail});
-                if (!targetUser) return null;
-                resolve(targetUser);
+                let targetUser;
+                if (typeof(userEmail) === 'object') {
+                    targetUser = this.userCollection.findOne({email: userEmail.email});
+                    resolve(targetUser);
+                }
+                else {
+                    targetUser = this.userCollection.findOne({email: userEmail});
+                    if (!targetUser) return null;
+                    resolve(targetUser);
+                }
+                
             })
         }
         catch(err) {
