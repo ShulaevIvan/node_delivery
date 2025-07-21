@@ -14,7 +14,6 @@ class ChatModule {
         try {
             if (!usersIdsArr && usersIdsArr.length < 2) return;
             let targetChat = await chatCollection.findOne({users: { $all: usersIdsArr }});
-            console.log(targetChat)
             if (!targetChat) {
                 targetChat = await this.createChat(usersIdsArr);
             }
@@ -65,13 +64,14 @@ class ChatModule {
 			    text: messageText,
 			    readAt: "",
 		    });
-            await newMessage.save();
+            const message = await newMessage.save();
             await chatCollection.updateOne({_id: chat._id}, {
                 $push: {
                     messages: [newMessage]
                 }
             });
-            return newMessage;
+
+            return message;
         }
         catch(err) {
             return {};
@@ -91,13 +91,12 @@ class ChatModule {
         
     };
 
-
-    subscribe(callback) {
-        this.chatEmmiter.on('messageAdded', ({ chat, message}) => {
-        callback({ chatId: chat.id, message });
-    });
-  }
+    async subscribe(callback) {
+        callback();
+    }
 };
+
+
 
 
 module.exports = new ChatModule();

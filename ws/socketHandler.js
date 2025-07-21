@@ -7,7 +7,6 @@ const initSocket = (io) => {
         console.log(`Socket connected: ${id}`);
 
         const currentUserData = socket.request.session.passport.user.data;
-        console.log(currentUserData)
 
         socket.on('getHistory', async (reciverId) => {
             const data = {
@@ -18,6 +17,7 @@ const initSocket = (io) => {
             const history = await ChatModule.getHistory(chat._id);
             socket.emit('chatHistory', history);
         });
+
         socket.on('sendMessage', async (message, reciver) => {
             if (!currentUserData || currentUserData._id === reciver) return;
             const data = {
@@ -27,22 +27,14 @@ const initSocket = (io) => {
             };
             console.log(`sender: ${currentUserData._id}`);
             console.log(`reciver: ${reciver}`);
-            await ChatModule.sendMessage(data);
-
-        });
-
-        socket.emit('newMessage', (message) => {
-
-        });
-        socket.emit('chatHistory', (chatHistory) => {
-
+            const messageData = await ChatModule.sendMessage(data);
+            ChatModule.chatEmmiter.emit('newMessage', messageData);
         });
         
         socket.on('disconnect', () => {
             console.log(`Socket disconnected: ${id}`);
         });
     });
-    
 }
 
 module.exports = initSocket;

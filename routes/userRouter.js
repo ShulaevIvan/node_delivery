@@ -15,7 +15,6 @@ router.get('/all-users', async (req, res) => {
 router.post('/signup', async (req, res) => {
      try {
         const data = req.body;
-        console.log(req.body)
         await hashPassword(data.password)
         .then((hashPassword) => {
             const userData = {
