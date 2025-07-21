@@ -13,8 +13,10 @@ const initSocket = (io) => {
                 senderUser: currentUserData._id,
                 reciverUser: reciverId,
             };
-            const chat = await ChatModule.find([data.senderUser, data.reciverId])
+            console.log(data)
+            const chat = await ChatModule.find([data.senderUser, data.reciverUser]);
             const history = await ChatModule.getHistory(chat._id);
+            console.log(history)
             socket.emit('chatHistory', history);
         });
 
@@ -25,11 +27,16 @@ const initSocket = (io) => {
                 reciverUser: reciver,
                 messageText: message
             };
-            console.log(`sender: ${currentUserData._id}`);
-            console.log(`reciver: ${reciver}`);
+            // console.log(`sender: ${currentUserData._id}`);
+            // console.log(`reciver: ${reciver}`);
             const messageData = await ChatModule.sendMessage(data);
-            ChatModule.chatEmmiter.emit('newMessage', messageData);
+            const chat = await ChatModule.find([data.senderUser, data.reciverUser])
+            socket.emit('newMessage', { chatId: chat._id, message: messageData });
         });
+
+        socket.on('subscribeToChat', (data) => {
+            console.log(data);
+        })
         
         socket.on('disconnect', () => {
             console.log(`Socket disconnected: ${id}`);

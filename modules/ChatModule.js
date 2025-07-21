@@ -47,6 +47,7 @@ class ChatModule {
             if (!users || !users.length === 2) return;
             const chat = await this.find(users);
             const message = await this.saveMessageToChat(chat, senderUser, messageText);
+            this.chatEmmiter.emit('newMessage', { chatId: chat.id, message });
             
             return message;
         }
@@ -82,8 +83,9 @@ class ChatModule {
     async getHistory(chatId) {
         try {
             const targetChat = await chatCollection.findOne({_id: chatId});
+            console.log(targetChat)
             if (!targetChat) return [];
-            return targetChat.messages;
+            return await messageCollection.find({'_id': {$in: [targetChat.messages]}});
         }
         catch(err) {
             return [];
@@ -92,9 +94,17 @@ class ChatModule {
     };
 
     async subscribe(callback) {
-        callback();
+        this.eventEmitter.on('newMessage', data => {
+            console.log(data)
+        // callback({ chatId: newMessageChatId, message });
+        });
+    };
+
+    async findChatByMessage(messageId) {
+        await this.chatCollection.findOne({_})
     }
 };
+
 
 
 
