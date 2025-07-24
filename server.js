@@ -34,8 +34,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/api', apiRouter);
-// app.use('/api', apiRouter);
-// app.use('/api/chat/', chatRouter);
 
 server.listen(PORT, () => {
     console.log(`server started at: \n http://${HOST}:${PORT}`);

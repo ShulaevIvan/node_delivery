@@ -6,14 +6,17 @@ const initSocket = (io) => {
         const { id } = socket;
         console.log(`Socket connected: ${id}`);
 
-        const currentUserData = socket.request.session.passport.user.data;
+        const currentUserData = socket.request.session.passport ? socket.request.session.passport.user.data : null;
+        if (!currentUserData) {
+            io.to(id).emit('newMessage', 'not authenticated');
+            return socket.disconnect();
+        }
 
         socket.on('getHistory', async (reciverId) => {
             const data = {
                 senderUser: currentUserData._id,
                 reciverUser: reciverId,
             };
-            console.log(data)
             const chat = await ChatModule.find([data.senderUser, data.reciverUser]);
             const history = await ChatModule.getHistory(chat._id);
             console.log(history)
@@ -27,8 +30,6 @@ const initSocket = (io) => {
                 reciverUser: reciver,
                 messageText: message
             };
-            // console.log(`sender: ${currentUserData._id}`);
-            // console.log(`reciver: ${reciver}`);
             const messageData = await ChatModule.sendMessage(data);
             const chat = await ChatModule.find([data.senderUser, data.reciverUser])
             socket.emit('newMessage', { chatId: chat._id, message: messageData });
