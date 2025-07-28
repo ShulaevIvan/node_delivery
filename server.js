@@ -12,6 +12,7 @@ const passportConfig = require('./passport/passport');
 const database = require('./database/database');
 const apiRouter = require('./routes/apiRouter');
 const initSocket = require('./ws/socketHandler');
+const createFolders = require('./utils/checkFolders');
 
 
 const sessionMiddleware = session({
@@ -39,6 +40,7 @@ server.listen(PORT, () => {
     console.log(`server started at: \n http://${HOST}:${PORT}`);
 });
 database();
+createFolders();
 
 io.engine.use(sessionMiddleware);
 initSocket(io);

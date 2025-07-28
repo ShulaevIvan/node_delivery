@@ -1,3 +1,6 @@
+const mongoose = require('mongoose');
+const advertisementCollection = require('../database/models/Advertisement');
+
 class AdvertisementModule {
     constructor() {
 
@@ -19,4 +22,4 @@ class AdvertisementModule {
     }
 };
 
-module.exports = AdvertisementModule;
+module.exports = new AdvertisementModule();
