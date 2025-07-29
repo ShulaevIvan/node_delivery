@@ -5,17 +5,20 @@ const isAuthenticated = require('../utils/isAuthenticated');
 const AdvertisementModule = require('../modules/AdvertisementModule');
 
 router.get('/', (req, res) => {
+    const advData = AdvertisementModule.get();
 
+    res.status(200).json({data: advData, 'status': 'ok'});
 });
 
 router.get('/:id', (req, res) => {
 
 });
 
-router.post('/', passport.authenticate('local'), uploadMiddleware.array('images'),  async (req, res) => {
+router.post('/', uploadMiddleware.array('images'),  async (req, res) => {
     const files = req.files;
     const { shortTitle, description } = req.body;
-    
+    passport.authenticate('local')
+    console.log(req.user)
     if (!files || files.length === 0) {
         return res.status(200).json({status: 'bad'});
     }

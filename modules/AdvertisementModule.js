@@ -6,14 +6,27 @@ class AdvertisementModule {
 
     }
     async get() {
+        try {
+            const advData = await advertisementCollection.find();
+            return advData;
+        }
+        catch(err) {
 
+        }
     }
 
     async getById() {
 
     }
 
-    async create() {
+    async create(data) {
+        try {
+            const currentDate = new Date();
+            console.log(data);
+        }
+        catch(err) {
+            
+        }
 
     }
 
