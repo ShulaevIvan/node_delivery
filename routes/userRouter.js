@@ -38,7 +38,10 @@ router.post('/signup', async (req, res) => {
 });
 
 router.post('/signin', passport.authenticate('local'), async (req, res, next) => {
-    return res.status(200).json(req.user);
+    req.login(req.user, (err) => {
+        if (err) { return next(err); }
+        return res.status(200).json(req.user);
+    });
 });
 
 router.post('/logout', async (req, res) => {

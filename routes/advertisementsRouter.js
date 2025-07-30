@@ -1,43 +1,57 @@
 const router = require('express').Router();
-const passport = require('passport');
 const uploadMiddleware = require('../utils/uploadFile');
 const isAuthenticated = require('../utils/isAuthenticated');
+const getUserBySession = require('../utils/getUserBySession');
 const AdvertisementModule = require('../modules/AdvertisementModule');
 
-router.get('/', (req, res) => {
-    const advData = AdvertisementModule.get();
+router.get('/', async (req, res) => {
+    const advData = await AdvertisementModule.get();
 
-    res.status(200).json({data: advData, 'status': 'ok'});
+    res.status(200).json({ data: advData, status: 'ok' });
 });
 
-router.get('/:id', (req, res) => {
+router.get('/:id', async (req, res) => {
+    const { id } = req.params;
+    const targetAdv = await AdvertisementModule.getById(id);
 
+    res.status(200).json({ data: targetAdv, status: 'ok' })
 });
 
-router.post('/', uploadMiddleware.array('images'),  async (req, res) => {
+router.post('/', getUserBySession, isAuthenticated, uploadMiddleware.array('images'),  async (req, res) => {
     const files = req.files;
     const { shortTitle, description } = req.body;
-    passport.authenticate('local')
-    console.log(req.user)
     if (!files || files.length === 0) {
-        return res.status(200).json({status: 'bad'});
-    }
-    if (!req.isAuthenticated()) {
-        return res.status(200).json({status: 'not auth'});
+        return res.status(200).json({ status: 'files not included' });
     }
     const data = {
-        email: req.session.passport.user.email,
-        name: req.session.passport.user.name,
+        email: req.session.passport.user.data.email,
+        name: req.session.passport.user.data.name,
         shortTitle: shortTitle,
         description: description,
         files: files
     };
     const createdAdv = await AdvertisementModule.create(data);
-    return res.status(201).json({status: 'ok'});
+    
+    return res.status(201).json({ status: 'ok', data: createdAdv });
 });
 
-router.delete('/', (req, res) => {
+router.delete('/:id', getUserBySession, isAuthenticated, async (req, res) => {
+    const { id } = req.params;
+    const userId = req.session.passport.user.data._id;
 
+    const deletedAdv = await AdvertisementModule.remove(id, userId);
+
+    return res.status(200).json({status: 'ok', data: deletedAdv });
 });
+
+router.post('/recover', getUserBySession, isAuthenticated, async (req, res) => {
+    const { id } = req.query;
+    const userId = req.session.passport.user.data._id;
+
+    const recoverAdv = await AdvertisementModule.recover(id, userId);
+
+    return res.status(200).json({status: 'ok', data: recoverAdv });
+});
+
 
 module.exports = router;
