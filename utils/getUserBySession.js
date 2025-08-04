@@ -6,14 +6,12 @@ const getUserBySession = async (req, res, next) => {
     const sessionFilePath = path.join(__dirname, `../sessions/${sessionId}.json`);
     if (fs.existsSync(sessionFilePath)) {
         const sessionData = require(`../sessions/${sessionId}.json`);
-        const userData = sessionData.passport.user;
+        const userData = sessionData.passport ? sessionData.passport.user  : null;
         req.login(userData, (err) => {
             if (err) { return next(err); }
             next();
         });
     }
-    
-    return 'test 23123'
 };
 
 

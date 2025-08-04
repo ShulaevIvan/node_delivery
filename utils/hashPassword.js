@@ -7,9 +7,8 @@ const hashPassword = async (password, saltRounds=10) => {
     return await bcrypt.hash(password, salt);
   } 
   catch (error) {
-    console.log(error)
+    return error;
   };
-  return null
 };
 
 module.exports = hashPassword;
