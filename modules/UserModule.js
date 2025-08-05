@@ -42,19 +42,16 @@ class UserModule {
 
     async findByEmail(userEmail) {
        try {
-            return new Promise((resolve, reject) => {
-                let targetUser;
-                if (typeof(userEmail) === 'object') {
-                    targetUser = this.userCollection.findOne({email: userEmail.email});
-                    resolve(targetUser);
+            let targetUser;
+            if (typeof(userEmail) === 'object') {
+                targetUser = await this.userCollection.findOne({email: userEmail.email});
+                return targetUser;
                 }
-                else {
-                    targetUser = this.userCollection.findOne({email: userEmail});
-                    if (!targetUser) return null;
-                    resolve(targetUser);
-                }
-                
-            })
+            else {
+                targetUser = await this.userCollection.findOne({email: userEmail});
+                if (!targetUser) return null;
+                return targetUser;
+            }
         }
         catch(err) {
             return reject({'message': 'server err'});

@@ -5,7 +5,7 @@ const initSocket = (io) => {
     io.on("connection", (socket) => {
         const { id } = socket;
         console.log(`Socket connected: ${id}`);
-
+        
         const currentUserData = socket.request.session.passport ? socket.request.session.passport.user.data : null;
         if (!currentUserData) {
             io.to(id).emit('newMessage', 'not authenticated');

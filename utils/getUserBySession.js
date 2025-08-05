@@ -12,6 +12,7 @@ const getUserBySession = async (req, res, next) => {
             next();
         });
     }
+    next();
 };
 
 

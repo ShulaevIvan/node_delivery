@@ -83,7 +83,6 @@ class ChatModule {
     async getHistory(chatId) {
         try {
             const targetChat = await chatCollection.findOne({_id: chatId});
-            console.log(targetChat)
             if (!targetChat) return [];
             return await messageCollection.find({'_id': {$in: [targetChat.messages]}});
         }
