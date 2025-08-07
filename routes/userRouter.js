@@ -23,7 +23,7 @@ router.post('/signup', async (req, res) => {
                return res.status(201).json({'status': 'ok', data: userObj});
             })
             .catch((err) => {
-                return res.status(201).json({'status': 'err', data: err.message});
+                return res.status(200).json({'status': 'err', data: err.message});
             })
         });
     }

@@ -18,8 +18,10 @@ const initSocket = (io) => {
                 reciverUser: reciverId,
             };
             const chat = await ChatModule.find([data.senderUser, data.reciverUser]);
+            if (!chat) {
+                return io.to(id).emit('newMessage', 'chat not found');
+            } 
             const history = await ChatModule.getHistory(chat._id);
-            console.log(history)
             socket.emit('chatHistory', history);
         });
 
